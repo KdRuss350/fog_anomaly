@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # data loader
     parser.add_argument('--data', type=str, required=False, default='SMAP', help='dataset type')
-    parser.add_argument('--root_path', type=str, default='./datasets/three_vibra_arw', help='root path of the data file')
+    parser.add_argument('--root_path', type=str, default='./datasets/three_vibra', help='root path of the data file')
     parser.add_argument('--data_path', type=str, default='SMAP_train.npy', help='data file')
     parser.add_argument('--features', type=str, default='M',
                         help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('--freq', type=str, default='d',
                         help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+    parser.add_argument('--arw', type=str, default=1, help='use arw')
 
     # forecasting task
     parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
@@ -58,8 +59,8 @@ if __name__ == '__main__':
     parser.add_argument('--enc_in', type=int, default=3, help='encoder input size')  ###这里在模型里面有体现
     parser.add_argument('--dec_in', type=int, default=3, help='decoder input size')
     parser.add_argument('--c_out', type=int, default=3, help='output size')
-    parser.add_argument('--d_model', type=int, default=8, help='dimension of model')
-    parser.add_argument('--n_heads', type=int, default=4, help='num of heads')
+    parser.add_argument('--d_model', type=int, default=16, help='dimension of model')
+    parser.add_argument('--n_heads', type=int, default=2, help='num of heads')
     parser.add_argument('--e_layers', type=int, default=2, help='num of encoder layers')
     parser.add_argument('--d_layers', type=int, default=1, help='num of decoder layers')
     parser.add_argument('--d_ff', type=int, default=64, help='dimension of fcn')
@@ -168,7 +169,7 @@ if __name__ == '__main__':
         for ii in range(args.itr):
             # setting record of experiments
             exp = Exp(args)  # set experiments
-            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
+            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
                 args.task_name,
                 args.model_id,
                 args.model,
@@ -187,6 +188,7 @@ if __name__ == '__main__':
                 args.factor,
                 args.embed,
                 args.distil,
+                args.arw,
                 args.des, ii)
 
             print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
@@ -197,7 +199,7 @@ if __name__ == '__main__':
             torch.cuda.empty_cache()
     else:
         ii = 0
-        setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
+        setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
             args.task_name,
             args.model_id,
             args.model,
@@ -216,7 +218,9 @@ if __name__ == '__main__':
             args.factor,
             args.embed,
             args.distil,
-            args.des, ii)
+            args.arw,
+            args.des,
+            ii)
 
         exp = Exp(args)  # set experiments
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))

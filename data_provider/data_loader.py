@@ -11,7 +11,9 @@ from data_provider.m4 import M4Dataset, M4Meta
 from data_provider.uea import subsample, interpolate_missing, Normalizer
 from sktime.datasets import load_from_tsfile_to_dataframe
 import warnings
+from sklearn.preprocessing import MinMaxScaler
 from utils.augmentation import run_augmentation_single
+from utils.Davar import DynamicAllanAnalyzer
 
 warnings.filterwarnings('ignore')
 
@@ -79,7 +81,7 @@ class Dataset_ETT_hour(Dataset):
             data_stamp = df_stamp.drop(['date'], 1).values
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
-            data_stamp = data_stamp.transpose(1, 0) 
+            data_stamp = data_stamp.transpose(1, 0)
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
@@ -482,20 +484,65 @@ class MSLSegLoader(Dataset):
 class SMAPSegLoader(Dataset):
     def __init__(self, args, root_path, win_size=25, step=1, flag="train"):
         self.flag = flag
+        self.args = args
         self.step = step
         self.win_size = win_size
         self.scaler = StandardScaler()
-        data = np.load(os.path.join(root_path, "SMAP_train.npy"))
-        self.scaler.fit(data)
-        data = self.scaler.transform(data)
-        test_data = np.load(os.path.join(root_path, "SMAP_test.npy"))
-        self.test = self.scaler.transform(test_data)
-        self.train = data
-        data_len = len(self.train)
-        self.val = self.train[(int)(data_len * 0.8):]
-        self.test_labels = np.load(os.path.join(root_path, "SMAP_test_label.npy"))
-        print("test:", self.test.shape)
+        self.arw_scaler = MinMaxScaler(feature_range=(0, 1))
+        if self.args.arw:
+            print('use combo arw data')
+            analyzer = DynamicAllanAnalyzer(dt=1, sf=252000)
+            arw_train_data = analyzer.analyze(
+                filename=os.path.join(root_path, "SMAP_train.npy"),
+                window_size=self.win_size,
+                step_size=1
+            )
+            arw_test_data = analyzer.analyze(
+                filename=os.path.join(root_path, "SMAP_test.npy"),
+                window_size=self.win_size,
+                step_size=1
+            )
+            # origin data
+            origin_train_data = np.load(os.path.join(root_path, "SMAP_train.npy"))[self.args.seq_len - 1:]
+            origin_test_data = np.load(os.path.join(root_path, "SMAP_test.npy"))[self.args.seq_len - 1:]
+            self.scaler.fit(origin_train_data)
+            origin_train_data = self.scaler.transform(origin_train_data)
+            origin_test_data = self.scaler.transform(origin_test_data)
+
+            # arw data
+            self.test_labels = np.load(os.path.join(root_path, "SMAP_test_label.npy"))
+            self.test_labels = np.roll(self.test_labels, shift=-(self.args.seq_len - 1), axis=0)
+            arw_train_data = self.arw_scaler.fit_transform(arw_train_data)  # shape (N, 3)
+            self.test = self.arw_scaler.transform(arw_test_data)
+
+            # combo
+            data = np.hstack((origin_train_data, arw_train_data))
+            # print("data的前5行:")
+            # print(data[:5])
+            self.test = np.hstack((origin_test_data, self.test))
+            # print("\nself.test的前5行:")
+            # print(self.test[:5])
+
+        else:
+            print('use origin data')
+            data = np.load(os.path.join(root_path, "SMAP_train.npy"))
+            test_data = np.load(os.path.join(root_path, "SMAP_test.npy"))
+            self.test_labels = np.load(os.path.join(root_path, "SMAP_test_label.npy"))
+            self.scaler.fit(data)
+            data = self.scaler.transform(data)
+            self.test = self.scaler.transform(test_data)
+
+        # 从原始数据data直接分割
+
+        data_len = len(data)
+        train_size = int(data_len * 0.8)
+
+        self.train = data[:train_size]
+        self.val = data[train_size:]  # 从原始数据分割验证集
+
         print("train:", self.train.shape)
+        print("val:", self.val.shape)
+        print("test:", self.test.shape)  # 确保test也是独立的数据
 
     def __len__(self):
         if self.flag == "train":

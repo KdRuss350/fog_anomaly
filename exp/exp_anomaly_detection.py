@@ -112,16 +112,14 @@ class Exp_Anomaly_Detection(Exp_Basic):
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
-            # print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} ".format(
-            #     epoch + 1, train_steps, train_loss, vali_loss,))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
             adjust_learning_rate(model_optim, epoch + 1, self.args)
-
-        best_model_path = path + '/' + 'checkpoint.pth'
-        self.model.load_state_dict(torch.load(best_model_path))
+        final_model_path = path + '/' + 'checkpoint.pth'
+        torch.save(self.model.state_dict(), final_model_path)
+        print("Final model saved!")
 
         return self.model
 
