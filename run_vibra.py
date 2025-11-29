@@ -40,6 +40,7 @@ if __name__ == '__main__':
 
     # forecasting task
     parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
+    parser.add_argument('--step', type=int, default=1, help='step size')
     parser.add_argument('--label_len', type=int, default=48, help='start token length')
     parser.add_argument('--pred_len', type=int, default=96, help='prediction sequence length')
     parser.add_argument('--seasonal_patterns', type=str, default='Monthly', help='subset for M4')
@@ -169,14 +170,14 @@ if __name__ == '__main__':
         for ii in range(args.itr):
             # setting record of experiments
             exp = Exp(args)  # set experiments
-            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
+            setting = '{}_{}_{}_{}_ft{}_sl{}_step{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
                 args.task_name,
                 args.model_id,
                 args.model,
                 args.data,
                 args.features,
                 args.seq_len,
-                args.label_len,
+                args.step,
                 args.pred_len,
                 args.d_model,
                 args.n_heads,
@@ -199,14 +200,14 @@ if __name__ == '__main__':
             torch.cuda.empty_cache()
     else:
         ii = 0
-        setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
+        setting = '{}_{}_{}_{}_ft{}_sl{}_step{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_arw_{}_{}'.format(
             args.task_name,
             args.model_id,
             args.model,
             args.data,
             args.features,
             args.seq_len,
-            args.label_len,
+            args.step,
             args.pred_len,
             args.d_model,
             args.n_heads,

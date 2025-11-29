@@ -34,6 +34,7 @@ def data_provider(args, flag):
             args = args,
             root_path=args.root_path,
             win_size=args.seq_len, # win_size=96,脚本里面设置的
+            step = args.step,
             flag=flag,
         )
         print(flag, len(data_set))
