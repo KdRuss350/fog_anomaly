@@ -171,7 +171,6 @@ class Exp_Anomaly_Detection(Exp_Basic):
         test_energy = np.array(attens_energy)
         # print(test_energy.shape) # 1442304
 
-
         combined_energy = np.concatenate([train_energy, test_energy], axis=0)
         threshold = np.percentile(combined_energy, 100 - self.args.anomaly_ratio) # 通过把训练&测试数据集合，定下阈值
         print("Threshold :", threshold)

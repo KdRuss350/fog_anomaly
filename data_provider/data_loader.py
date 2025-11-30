@@ -487,11 +487,12 @@ class SMAPSegLoader(Dataset):
         self.args = args
         self.step = step
         self.win_size = win_size
-        self.scaler = StandardScaler()
-        self.arw_scaler = MinMaxScaler(feature_range=(0, 1))
+        self.scaler = MinMaxScaler(feature_range=(0, 1))
         if self.args.arw:
             print('use combo arw data')
             analyzer = DynamicAllanAnalyzer(dt=1, sf=252000)
+
+            # arw data
             arw_train_data = analyzer.analyze(
                 filename=os.path.join(root_path, "SMAP_train.npy"),
                 window_size=self.win_size,
@@ -502,24 +503,32 @@ class SMAPSegLoader(Dataset):
                 window_size=self.win_size,
                 step_size=1
             )
+
             # origin data
             origin_train_data = np.load(os.path.join(root_path, "SMAP_train.npy"))[self.args.seq_len - 1:]
             origin_test_data = np.load(os.path.join(root_path, "SMAP_test.npy"))[self.args.seq_len - 1:]
-            self.scaler.fit(origin_train_data)
-            origin_train_data = self.scaler.transform(origin_train_data)
-            origin_test_data = self.scaler.transform(origin_test_data)
-
-            # arw data
-            self.test_labels = np.load(os.path.join(root_path, "SMAP_test_label.npy"))
-            self.test_labels = np.roll(self.test_labels, shift=-(self.args.seq_len - 1), axis=0)
-            arw_train_data = self.arw_scaler.fit_transform(arw_train_data)  # shape (N, 3)
-            self.test = self.arw_scaler.transform(arw_test_data)
 
             # combo
             data = np.hstack((origin_train_data, arw_train_data))
+            self.test = np.hstack((origin_test_data, arw_test_data))
+
+            # scale
+            self.scaler.fit(data)
+            data = self.scaler.transform(data)  # 训练数据缩放
+            self.test = self.scaler.transform(self.test)  # 测试数据缩放
+
+            # df_train = pd.DataFrame(data)
+            # df_train.to_csv("train_scaled.csv", index=False)
+            #
+            # df_test = pd.DataFrame(self.test)
+            # df_test.to_csv("test_scaled.csv", index=False)
+
+            # label
+            self.test_labels = np.load(os.path.join(root_path, "SMAP_test_label.npy"))
+            self.test_labels = np.roll(self.test_labels, shift=-(self.args.seq_len - 1), axis=0)
+
             # print("data的前5行:")
             # print(data[:5])
-            self.test = np.hstack((origin_test_data, self.test))
             # print("\nself.test的前5行:")
             # print(self.test[:5])
 

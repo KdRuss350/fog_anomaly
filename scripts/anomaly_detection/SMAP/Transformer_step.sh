@@ -23,6 +23,7 @@ python run_vibra.py \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
+
   --anomaly_ratio 2.6 \
   --batch_size 32 \
   --train_epochs 30

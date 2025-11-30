@@ -23,6 +23,29 @@ python run_vibra.py \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
+  --arw 1 \
+  --anomaly_ratio 2.6 \
+  --batch_size 32 \
+  --train_epochs 30
+
+echo "ours 实验完成"
+
+python run_vibra.py \
+  --task_name anomaly_detection \
+  --is_training 1 \
+  --root_path ./datasets/three_axis_vibra \
+  --model_id SMAP \
+  --model Transformer \
+  --data SMAP \
+  --features M \
+  --seq_len 16 \
+  --pred_len 0 \
+  --d_model 64 \
+  --d_ff 256 \
+  --e_layers 2 \
+  --enc_in 3 \
+  --c_out 3 \
+  --arw 0 \
   --anomaly_ratio 2.6 \
   --batch_size 32 \
   --train_epochs 30
@@ -44,6 +67,7 @@ python run_vibra.py \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
+  --arw 0 \
   --anomaly_ratio 2.6 \
   --batch_size 32 \
   --train_epochs 30
@@ -65,13 +89,34 @@ python run_vibra.py \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
+  --arw 0 \
   --anomaly_ratio 2.6 \
   --batch_size 32 \
   --train_epochs 30
 
 echo "Informer 实验完成"
 
+python run_vibra.py \
+  --task_name anomaly_detection \
+  --is_training 1 \
+  --root_path ./datasets/three_axis_vibra \
+  --model_id SMAP \
+  --model Reformer \
+  --data SMAP \
+  --features M \
+  --seq_len 16 \
+  --pred_len 0 \
+  --d_model 64 \
+  --d_ff 256 \
+  --e_layers 2 \
+  --enc_in 3 \
+  --c_out 3 \
+  --arw 0 \
+  --anomaly_ratio 2.6 \
+  --batch_size 32 \
+  --train_epochs 30
 
+echo "Reformer 实验完成"
 
 
 
