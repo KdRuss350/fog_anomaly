@@ -83,12 +83,12 @@ class Exp_Anomaly_Detection(Exp_Basic):
 
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x, batch_y) in enumerate(train_loader): # 异常检测的batch_y在哪里？看loader，应该是测试的标签把
+            for i, (batch_x, batch_y) in enumerate(train_loader):  # 异常检测的batch_y在哪里？看loader，应该是测试的标签把
                 iter_count += 1
                 model_optim.zero_grad()
 
                 batch_x = batch_x.float().to(self.device)
-                outputs = self.model(batch_x, None, None, None)###训练阶段没有标签
+                outputs = self.model(batch_x, None, None, None)  ###训练阶段没有标签
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, :, f_dim:]
                 loss = criterion(outputs, batch_x)
@@ -108,7 +108,7 @@ class Exp_Anomaly_Detection(Exp_Basic):
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
             vali_loss = self.vali(vali_data, vali_loader, criterion)
-            test_loss = self.vali(test_data, test_loader, criterion) # 还要拿测试数据也进行验证？
+            test_loss = self.vali(test_data, test_loader, criterion)  # 还要拿测试数据也进行验证？
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
@@ -123,7 +123,7 @@ class Exp_Anomaly_Detection(Exp_Basic):
 
         return self.model
 
-    def test(self, setting, test=0): # 测试这里把训练和测试数据又都跑了一遍？为什么
+    def test(self, setting, test=0):  # 测试这里把训练和测试数据又都跑了一遍？为什么
         test_data, test_loader = self._get_data(flag='test')
         train_data, train_loader = self._get_data(flag='train')
         if test:
@@ -145,7 +145,7 @@ class Exp_Anomaly_Detection(Exp_Basic):
                 # reconstruction
                 outputs = self.model(batch_x, None, None, None)
                 # criterion
-                score = torch.mean(self.anomaly_criterion(batch_x, outputs), dim=-1) # 输入输出之间的误差，一个batch算一次
+                score = torch.mean(self.anomaly_criterion(batch_x, outputs), dim=-1)  # 输入输出之间的误差，一个batch算一次
                 score = score.detach().cpu().numpy()
                 attens_energy.append(score)
 
@@ -172,7 +172,7 @@ class Exp_Anomaly_Detection(Exp_Basic):
         # print(test_energy.shape) # 1442304
 
         combined_energy = np.concatenate([train_energy, test_energy], axis=0)
-        threshold = np.percentile(combined_energy, 100 - self.args.anomaly_ratio) # 通过把训练&测试数据集合，定下阈值
+        threshold = np.percentile(combined_energy, 100 - self.args.anomaly_ratio)  # 通过把训练&测试数据集合，定下阈值
         print("Threshold :", threshold)
 
         # (3) evaluation on the test set
@@ -185,7 +185,7 @@ class Exp_Anomaly_Detection(Exp_Basic):
         print("gt:     ", gt.shape)
 
         # (4) detection adjustment
-        gt, pred = adjustment(gt, pred) #没有adjustment f1分数下降很多
+        gt, pred = adjustment(gt, pred)  # 没有adjustment f1分数下降很多
 
         pred = np.array(pred)
         gt = np.array(gt)
@@ -206,11 +206,11 @@ class Exp_Anomaly_Detection(Exp_Basic):
 
         import time
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        
+
         f = open("result_anomaly_detection.txt", 'a')
         f.write("Time: " + current_time + "\n")
-        f.write("Config: task={}, model={}, data={}, seq_len={}, anomaly_ratio={:.1f}%\n".format(
-            self.args.task_name, self.args.model, self.args.data, 
+        f.write("Config: task={}, model={}, data={}, arw={}, seq_len={}, anomaly_ratio={:.1f}%\n".format(
+            self.args.task_name, self.args.model, self.args.data, self.args.arw,
             self.args.seq_len, self.args.anomaly_ratio))
         f.write("Threshold: {:.6f}\n".format(threshold))
         f.write("Accuracy : {:0.4f}, Precision : {:0.4f}, Recall : {:0.4f}, F-score : {:0.4f} ".format(

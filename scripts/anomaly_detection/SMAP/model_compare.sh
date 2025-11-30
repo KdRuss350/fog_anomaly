@@ -16,15 +16,15 @@ python run_vibra.py \
   --model Transformer \
   --data SMAP \
   --features M \
-  --seq_len 16 \
+  --seq_len 48 \
   --pred_len 0 \
-  --d_model 64 \
-  --d_ff 256 \
+  --d_model 16 \
+  --d_ff 64 \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
   --arw 1 \
-  --anomaly_ratio 2.6 \
+  --anomaly_ratio 2 \
   --batch_size 32 \
   --train_epochs 30
 
@@ -38,15 +38,15 @@ python run_vibra.py \
   --model Transformer \
   --data SMAP \
   --features M \
-  --seq_len 16 \
+  --seq_len 48 \
   --pred_len 0 \
-  --d_model 64 \
-  --d_ff 256 \
+  --d_model 16 \
+  --d_ff 64 \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
   --arw 0 \
-  --anomaly_ratio 2.6 \
+  --anomaly_ratio 2 \
   --batch_size 32 \
   --train_epochs 30
 
@@ -60,15 +60,15 @@ python run_vibra.py \
   --model Autoformer \
   --data SMAP \
   --features M \
-  --seq_len 16 \
+  --seq_len 48 \
   --pred_len 0 \
-  --d_model 64 \
-  --d_ff 256 \
+  --d_model 16 \
+  --d_ff 64 \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
   --arw 0 \
-  --anomaly_ratio 2.6 \
+  --anomaly_ratio 2 \
   --batch_size 32 \
   --train_epochs 30
 
@@ -82,15 +82,15 @@ python run_vibra.py \
   --model Informer \
   --data SMAP \
   --features M \
-  --seq_len 16 \
+  --seq_len 48 \
   --pred_len 0 \
-  --d_model 64 \
-  --d_ff 256 \
+  --d_model 16 \
+  --d_ff 64 \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
   --arw 0 \
-  --anomaly_ratio 2.6 \
+  --anomaly_ratio 2 \
   --batch_size 32 \
   --train_epochs 30
 
@@ -104,15 +104,15 @@ python run_vibra.py \
   --model Reformer \
   --data SMAP \
   --features M \
-  --seq_len 16 \
+  --seq_len 48 \
   --pred_len 0 \
-  --d_model 64 \
-  --d_ff 256 \
+  --d_model 16 \
+  --d_ff 64 \
   --e_layers 2 \
   --enc_in 3 \
   --c_out 3 \
   --arw 0 \
-  --anomaly_ratio 2.6 \
+  --anomaly_ratio 2 \
   --batch_size 32 \
   --train_epochs 30
 
