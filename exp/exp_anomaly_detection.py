@@ -185,7 +185,10 @@ class Exp_Anomaly_Detection(Exp_Basic):
         print("gt:     ", gt.shape)
 
         # (4) detection adjustment
-        gt, pred = adjustment(gt, pred)  # 没有adjustment f1分数下降很多
+        if self.args.arw == 1:
+            gt, pred = adjustment(gt, pred)  # 没有adjustment f1分数下降很多
+        else:
+            pass
 
         pred = np.array(pred)
         gt = np.array(gt)

@@ -42,7 +42,6 @@ class DynamicAllanAnalyzer:
     def analyze(self, filename, window_size, step_size):
 
         data = np.load(filename) / self.sf
-        print(data.shape)
         self.results = {}
         axis_list = ["X轴", "Y轴", "Z轴"]
 

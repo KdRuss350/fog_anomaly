@@ -31,7 +31,7 @@ class Dataset_ETT_hour(Dataset):
             self.pred_len = 24 * 4
         else:
             self.seq_len = size[0]  ##96
-            self.label_len = size[1] ##48
+            self.label_len = size[1]  ##48
             self.pred_len = size[2]  ##96 or 1
         # init
         assert flag in ['train', 'test', 'val']
@@ -55,8 +55,8 @@ class Dataset_ETT_hour(Dataset):
 
         border1s = [0, 12 * 30 * 24 - self.seq_len, 12 * 30 * 24 + 4 * 30 * 24 - self.seq_len]
         border2s = [12 * 30 * 24, 12 * 30 * 24 + 4 * 30 * 24, 12 * 30 * 24 + 8 * 30 * 24]
-        border1 = border1s[self.set_type] ### 0
-        border2 = border2s[self.set_type] ### 12*30*24
+        border1 = border1s[self.set_type]  ### 0
+        border2 = border2s[self.set_type]  ### 12*30*24
 
         if self.features == 'M' or self.features == 'MS':
             cols_data = df_raw.columns[1:]
@@ -73,7 +73,7 @@ class Dataset_ETT_hour(Dataset):
 
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
-        if self.timeenc == 0: ###默认是0
+        if self.timeenc == 0:  ###默认是0
             df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
             df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
             df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
@@ -86,7 +86,7 @@ class Dataset_ETT_hour(Dataset):
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
 
-        if self.set_type == 0 and self.args.augmentation_ratio > 0: ###默认self.args.augmentation_ratio是0
+        if self.set_type == 0 and self.args.augmentation_ratio > 0:  ###默认self.args.augmentation_ratio是0
             self.data_x, self.data_y, augmentation_tags = run_augmentation_single(self.data_x, self.data_y, self.args)
 
         self.data_stamp = data_stamp
@@ -203,7 +203,7 @@ class Dataset_ETT_minute(Dataset):
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
 
-    def inverse_transform(self, data):###数值反归一化
+    def inverse_transform(self, data):  ###数值反归一化
         return self.scaler.inverse_transform(data)
 
 
@@ -328,9 +328,9 @@ class Dataset_M4(Dataset):
         self.label_len = size[1]
         self.pred_len = size[2]
 
-        self.seasonal_patterns = seasonal_patterns ###对应yearly hourly 这些
-        self.history_size = M4Meta.history_size[seasonal_patterns]###'Yearly': 1.5,
-        self.window_sampling_limit = int(self.history_size * self.pred_len)###
+        self.seasonal_patterns = seasonal_patterns  ###对应yearly hourly 这些
+        self.history_size = M4Meta.history_size[seasonal_patterns]  ###'Yearly': 1.5,
+        self.window_sampling_limit = int(self.history_size * self.pred_len)  ###
         self.flag = flag
 
         self.__read_data__()
@@ -390,6 +390,7 @@ class Dataset_M4(Dataset):
             insample[i, -len(ts):] = ts_last_window
             insample_mask[i, -len(ts):] = 1.0
         return insample, insample_mask
+
 
 class PSMSegLoader(Dataset):
     def __init__(self, args, root_path, win_size, step=1, flag="train"):
@@ -487,9 +488,9 @@ class SMAPSegLoader(Dataset):
         self.args = args
         self.step = step
         self.win_size = win_size
-        self.scaler = MinMaxScaler(feature_range=(0, 1))
+        self.scaler = MinMaxScaler(feature_range=(-1, 1))
         if self.args.arw:
-            print('use combo arw data')
+            print('use arw data')
             analyzer = DynamicAllanAnalyzer(dt=1, sf=252000)
 
             # arw data
@@ -565,11 +566,11 @@ class SMAPSegLoader(Dataset):
 
     def __getitem__(self, index):
         index = index * self.step
-        if self.flag == "train":    ###训练阶段没有标签,只有x，后面没有意义
+        if self.flag == "train":  ###训练阶段没有标签,只有x，后面没有意义
             return np.float32(self.train[index:index + self.win_size]), np.float32(self.test_labels[0:self.win_size])
         elif (self.flag == 'val'):
             return np.float32(self.val[index:index + self.win_size]), np.float32(self.test_labels[0:self.win_size])
-        elif (self.flag == 'test'): ###测试阶段才有标签
+        elif (self.flag == 'test'):  ###测试阶段才有标签
             return np.float32(self.test[index:index + self.win_size]), np.float32(
                 self.test_labels[index:index + self.win_size])
         else:
@@ -734,7 +735,7 @@ class UEAloader(Dataset):
             data_paths = list(filter(lambda x: re.search(flag, x), data_paths))
         input_paths = [p for p in data_paths if os.path.isfile(p) and p.endswith('.ts')]
         if len(input_paths) == 0:
-            pattern='*.ts'
+            pattern = '*.ts'
             raise Exception("No .ts files found using pattern: '{}'".format(pattern))
 
         all_df, labels_df = self.load_single(input_paths[0])  # a single file contains dataset
@@ -743,7 +744,7 @@ class UEAloader(Dataset):
 
     def load_single(self, filepath):
         df, labels = load_from_tsfile_to_dataframe(filepath, return_separate_X_and_y=True,
-                                                             replace_missing_vals_with='NaN')
+                                                   replace_missing_vals_with='NaN')
         labels = pd.Series(labels, dtype="category")
         self.class_names = labels.cat.categories
         labels_df = pd.DataFrame(labels.cat.codes,

@@ -1,3 +1,4 @@
+import os
 from arw_simulation import signal1
 from arw_simulation import signal2
 import matplotlib.pyplot as plt
@@ -114,7 +115,7 @@ t1, tau1, davar1 = compute_dynamic_avar(signal1 * 3600, window_size=1000, step_s
 t2, tau2, davar2 = compute_dynamic_avar(signal2 * 3600, window_size=1000, step_size=5)
 # plot_davar_3d(t2/100, tau2/100, davar2)
 
-fig = plt.figure(figsize=(16, 7))
+fig = plt.figure(figsize=(16, 8))
 
 ax1 = fig.add_subplot(1, 2, 1, projection='3d')
 plot_davar_3d(t1/100, tau1/100, davar1, ax=ax1)
@@ -122,8 +123,31 @@ plot_davar_3d(t1/100, tau1/100, davar1, ax=ax1)
 ax2 = fig.add_subplot(1, 2, 2, projection='3d')
 plot_davar_3d(t2/100, tau2/100, davar2, ax=ax2)
 
+# 获取子图位置
+pos1 = ax1.get_position()
+pos2 = ax2.get_position()
 
-plt.tight_layout()
+fig.text(pos1.x0 + pos1.width/2, pos1.y0 - 0.05, '(a)',
+         fontsize=16,  ha='center')
+fig.text(pos2.x0 + pos2.width/2, pos2.y0 - 0.05, '(b)',
+         fontsize=16,  ha='center')
+
+# ============ 新增：保存图片部分 ============
+# 1. 构建保存路径
+current_dir = os.path.dirname(os.path.abspath(__file__))  # 当前脚本目录
+parent_dir = os.path.dirname(current_dir)  # 上一级目录
+pic_dir = os.path.join(parent_dir, 'pic')  # 上一级目录中的pic文件夹
+
+# 2. 如果pic文件夹不存在，创建它
+if not os.path.exists(pic_dir):
+    os.makedirs(pic_dir)
+
+# 3. 保存为PDF文件
+pdf_path = os.path.join(pic_dir, 'davar.pdf')
+plt.savefig(pdf_path, format='pdf', dpi=300)
+print(f"图片已保存到: {pdf_path}")
+
+# 4. 显示图片
 plt.show()
 
 
