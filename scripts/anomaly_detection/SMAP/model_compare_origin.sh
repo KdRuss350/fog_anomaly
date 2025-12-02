@@ -102,7 +102,7 @@ python run_vibra.py \
   --is_training 1 \
   --root_path ./datasets/three_axis_vibra \
   --model_id SMAP \
-  --model Timesnet \
+  --model TimesNet \
   --data SMAP \
   --features M \
   --seq_len 48 \
@@ -117,7 +117,7 @@ python run_vibra.py \
   --batch_size 32 \
   --train_epochs 30
 
-echo "Timesnet 实验完成"
+echo "TimesNet 实验完成"
 
 
 python run_vibra.py \
@@ -125,7 +125,7 @@ python run_vibra.py \
   --is_training 1 \
   --root_path ./datasets/three_axis_vibra \
   --model_id SMAP \
-  --model Dlinear \
+  --model DLinear \
   --data SMAP \
   --features M \
   --seq_len 48 \
@@ -140,6 +140,6 @@ python run_vibra.py \
   --batch_size 32 \
   --train_epochs 30
 
-echo "Dlinear 实验完成"
+echo "DLinear 实验完成"
 
 

@@ -102,7 +102,7 @@ python run_vibra.py \
   --is_training 1 \
   --root_path ./datasets/three_axis_vibra \
   --model_id SMAP \
-  --model Timesnet \
+  --model TimesNet \
   --data SMAP \
   --features M \
   --seq_len 48 \
@@ -125,7 +125,7 @@ python run_vibra.py \
   --is_training 1 \
   --root_path ./datasets/three_axis_vibra \
   --model_id SMAP \
-  --model Dlinear \
+  --model DLinear \
   --data SMAP \
   --features M \
   --seq_len 48 \

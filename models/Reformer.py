@@ -22,8 +22,15 @@ class Model(nn.Module):
         self.pred_len = configs.pred_len
         self.seq_len = configs.seq_len
 
-        self.enc_embedding = DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq,
-                                           configs.dropout)
+        # self.enc_embedding = DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq,
+        #                                    configs.dropout)
+
+        self.enc_embedding = (
+            DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
+            if configs.arw == 0
+            else DataEmbedding(configs.enc_in + 3, configs.d_model, configs.embed, configs.freq, configs.dropout)
+        )
+
         # Encoder
         self.encoder = Encoder(
             [
@@ -45,8 +52,11 @@ class Model(nn.Module):
             self.projection = nn.Linear(
                 configs.d_model * configs.seq_len, configs.num_class)
         else:
-            self.projection = nn.Linear(
-                configs.d_model, configs.c_out, bias=True)
+            # self.projection = nn.Linear(
+            #     configs.d_model, configs.c_out, bias=True)
+            output_dim = configs.c_out + 3 if getattr(configs, 'arw', 0) == 1 else configs.c_out
+            self.projection = nn.Linear(configs.d_model, output_dim, bias=True)
+
 
     def long_forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # add placeholder
@@ -123,9 +133,11 @@ class Model(nn.Module):
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc)
             return dec_out  # [B, L, D]
+
         if self.task_name == 'anomaly_detection':
             dec_out = self.anomaly_detection(x_enc)
             return dec_out  # [B, L, D]
+
         if self.task_name == 'classification':
             dec_out = self.classification(x_enc, x_mark_enc)
             return dec_out  # [B, N]

@@ -28,8 +28,14 @@ class Model(nn.Module):
         self.decomp = series_decomp(kernel_size)
 
         # Embedding
-        self.enc_embedding = DataEmbedding_wo_pos(configs.enc_in, configs.d_model, configs.embed, configs.freq,
-                                                  configs.dropout)
+        # self.enc_embedding = DataEmbedding_wo_pos(configs.enc_in, configs.d_model, configs.embed, configs.freq,
+        #                                           configs.dropout)
+        self.enc_embedding = (
+            DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
+            if configs.arw == 0
+            else DataEmbedding(configs.enc_in + 3, configs.d_model, configs.embed, configs.freq, configs.dropout)
+        )
+
         # Encoder
         self.encoder = Encoder(
             [
@@ -77,9 +83,14 @@ class Model(nn.Module):
         if self.task_name == 'imputation':
             self.projection = nn.Linear(
                 configs.d_model, configs.c_out, bias=True)
+        # if self.task_name == 'anomaly_detection':
+        #     self.projection = nn.Linear(
+        #         configs.d_model, configs.c_out, bias=True)
         if self.task_name == 'anomaly_detection':
-            self.projection = nn.Linear(
-                configs.d_model, configs.c_out, bias=True)
+            # self.projection = nn.Linear(configs.d_model, configs.c_out, bias=True)
+            output_dim = configs.c_out + 3 if getattr(configs, 'arw', 0) == 1 else configs.c_out
+            self.projection = nn.Linear(configs.d_model, output_dim, bias=True)
+
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
