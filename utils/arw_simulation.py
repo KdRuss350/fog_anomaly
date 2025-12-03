@@ -28,35 +28,43 @@ class DynamicAllanAnalyzer:
 # 生成信号
 # ------------------------------------------------------------
 N = 60000
-sigma1 = 2   # 前半段噪声方差
-sigma2 = 3 # 后半段噪声方差
-step_position = 40000
+sigma1 = 2   # 第一段和第三段噪声方差
+sigma2 = 3   # 第二段噪声方差
+step_position1 = 20000  # 第一段结束位置
+step_position2 = 50000  # 第二段结束位置（第三段开始位置）
 
-# 信号1：纯白噪声
-signal1 = np.random.normal(0, sigma1, N)  / 3600
+# 信号1：纯白噪声（如果需要保持原样）
+signal1 = np.random.normal(0, sigma1, N) / 3600
 
-# 信号2：白噪声 + 台阶 + 不同方差
-noise_before = np.random.normal(0, sigma1, step_position)
-noise_after = np.random.normal(0, sigma2, N - step_position)
-signal2 = np.concatenate([noise_before, noise_after]) / 3600
+# 信号2：三段不同方差的白噪声
+# 第一段：方差为 sigma1
+noise_segment1 = np.random.normal(0, sigma1, step_position1)
+
+# 第二段：方差为 sigma2
+segment2_length = step_position2 - step_position1
+noise_segment2 = np.random.normal(0, sigma2, segment2_length)
+
+# 第三段：方差为 sigma1（与第一段相同）
+segment3_length = N - step_position2
+noise_segment3 = np.random.normal(0, sigma1, segment3_length)
+
+# 合并三段信号
+signal2 = np.concatenate([noise_segment1, noise_segment2, noise_segment3]) / 3600
 
 ### 和标度因数没关系，都是换成°/s，标准单位进去计算
 
+# ------------------------------------------------------------
+# 动态 ARW 分析
+# ------------------------------------------------------------
+analyzer = DynamicAllanAnalyzer()
+
+window_size = 100
+step_size = 1
+
+arw1 = analyzer.analyze_signal(signal1, window_size, step_size)
+arw2 = analyzer.analyze_signal(signal2, window_size, step_size)
+
 if __name__ == "__main__":
-
-    # ------------------------------------------------------------
-    # 动态 ARW 分析
-    # ------------------------------------------------------------
-    analyzer = DynamicAllanAnalyzer()
-
-    window_size = 100
-    step_size = 1
-
-    arw1 = analyzer.analyze_signal(signal1, window_size, step_size)
-    arw2 = analyzer.analyze_signal(signal2, window_size, step_size)
-    # ------------------------------------------------------------
-    # pic2: 动态 ARW
-    # ------------------------------------------------------------
     plt.figure(figsize=(12,6))
 
     plt.subplot(1,2,1)

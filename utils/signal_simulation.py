@@ -1,4 +1,4 @@
-from arw_simulation import  signal1, signal2, step_position
+from arw_simulation import  signal1, signal2, arw2
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -7,15 +7,15 @@ import numpy as np
 fig = plt.figure(figsize=(12, 8))
 
 # 第一个子图
-plt.subplot(1, 2, 1)
-plt.plot(np.arange(len(signal1)) / 100,signal1 * 3600)
+plt.subplot(1, 2, 2)
+plt.plot(np.arange(len(arw2)) / 100, arw2)
 plt.xlabel("Time(s)")
-plt.ylabel('FOG output(°/h)')
+plt.ylabel('N(°/√h)')
 pos1 = plt.gca().get_position()  # 获取第一个子图的位置信息
 
 # 第二个子图
-plt.subplot(1, 2, 2)
-plt.plot(np.arange(len(signal1)) / 100,signal2 * 3600)
+plt.subplot(1, 2, 1)
+plt.plot(np.arange(len(signal1)) / 100, signal2 * 3600)
 plt.xlabel("Time(s)")
 plt.ylabel('FOG output(°/h)')
 pos2 = plt.gca().get_position()  # 获取第二个子图的位置信息
