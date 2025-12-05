@@ -1,4 +1,7 @@
 import os
+import matplotlib.gridspec as gridspec
+from arw_simulation import arw1
+from arw_simulation import arw2
 from arw_simulation import signal1
 from arw_simulation import signal2
 import matplotlib.pyplot as plt
@@ -108,6 +111,7 @@ def plot_davar_3d(time_centers, tau_array, davar_matrix, ax):
 # D-AVAR for signal1
 # ------------------------------------------------------------
 t1, tau1, davar1 = compute_dynamic_avar(signal1 * 3600, window_size=1000, step_size=5)
+
 # plot_davar_3d(t1/100, tau1/100, davar1)
 # ------------------------------------------------------------
 # D-AVAR for signal2
@@ -115,21 +119,49 @@ t1, tau1, davar1 = compute_dynamic_avar(signal1 * 3600, window_size=1000, step_s
 t2, tau2, davar2 = compute_dynamic_avar(signal2 * 3600, window_size=1000, step_size=5)
 # plot_davar_3d(t2/100, tau2/100, davar2)
 
-fig = plt.figure(figsize=(16, 8))
-
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+fig1 = plt.figure(figsize=(16, 8))
+# 使用 gridspec 设置宽度比例
+gs = gridspec.GridSpec(1, 2, width_ratios=[1.3, 1])  # 左:右 = 1:1
+# ----- subplot 1: 3D DAVAR -----
+ax1 = fig1.add_subplot(gs[0], projection='3d')
 plot_davar_3d(t1/100, tau1/100, davar1, ax=ax1)
-
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-plot_davar_3d(t2/100, tau2/100, davar2, ax=ax2)
+# ----- subplot 2: ARW 曲线图 -----
+ax2 = fig1.add_subplot(gs[1])   # 普通 2D subplot
+ax2.plot(np.arange(len(arw1)) / 100, arw1)
+ax2.set_xlabel("Time")
+ax2.set_ylabel("N")
+plt.subplots_adjust(wspace=0.3)
 
 # 获取子图位置
 pos1 = ax1.get_position()
 pos2 = ax2.get_position()
 
-fig.text(pos1.x0 + pos1.width/2, pos1.y0 - 0.05, '(a)',
+fig1.text(pos1.x0 + pos1.width/2, pos1.y0 - 0.10, '(a)',
          fontsize=16,  ha='center')
-fig.text(pos2.x0 + pos2.width/2, pos2.y0 - 0.05, '(b)',
+fig1.text(pos2.x0 + pos2.width/2, pos2.y0 - 0.10, '(b)',
+         fontsize=16,  ha='center')
+
+
+fig2 = plt.figure(figsize=(16, 8))
+# 使用 gridspec 设置宽度比例
+gs = gridspec.GridSpec(1, 2, width_ratios=[1.3, 1])  # 左:右 = 1:1
+# ----- subplot 1: 3D DAVAR -----
+ax3 = fig2.add_subplot(gs[0], projection='3d')
+plot_davar_3d(t2/100, tau2/100, davar2, ax=ax3)
+# ----- subplot 2: ARW 曲线图 -----
+ax4 = fig2.add_subplot(gs[1])   # 普通 2D subplot
+ax4.plot(np.arange(len(arw2)) / 100, arw2)
+ax4.set_xlabel("Time")
+ax4.set_ylabel("N")
+plt.subplots_adjust(wspace=0.3)
+
+# 获取子图位置
+pos3 = ax3.get_position()
+pos4 = ax4.get_position()
+
+fig2.text(pos3.x0 + pos3.width/2, pos3.y0 - 0.10, '(a)',
+         fontsize=16,  ha='center')
+fig2.text(pos4.x0 + pos4.width/2, pos4.y0 - 0.10, '(b)',
          fontsize=16,  ha='center')
 
 # ============ 新增：保存图片部分 ============
@@ -143,9 +175,13 @@ if not os.path.exists(pic_dir):
     os.makedirs(pic_dir)
 
 # 3. 保存为PDF文件
-pdf_path = os.path.join(pic_dir, 'davar.pdf')
-plt.savefig(pdf_path, format='pdf', dpi=300)
-print(f"图片已保存到: {pdf_path}")
+# 保存路径
+pdf_path_normal = os.path.join(pic_dir, 'davar_normal.pdf')
+pdf_path_abnormal = os.path.join(pic_dir, 'davar_abnormal.pdf')
+
+# 保存 PDF
+fig1.savefig(pdf_path_normal, format='pdf', bbox_inches='tight')
+fig2.savefig(pdf_path_abnormal, format='pdf', bbox_inches='tight')
 
 # 4. 显示图片
 plt.show()
